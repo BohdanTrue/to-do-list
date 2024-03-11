@@ -15,11 +15,14 @@
         <input type="text" id="input-box" placeholder="Add your task here">
         <button onclick="addTask()">Add</button>
       </div>
-
+      <div>
+        <input type="radio" name="filter" id="filterAll" checked onchange="filterTasks()"> All
+        <input type="radio" name="filter" id="filterCompleted" onchange="filterTasks()"> Completed
+        <input type="radio" name="filter" id="filterUncompleted" onchange="filterTasks()"> Uncompleted
+      </div>
       <ul id="list-container"></ul>
     </div>
   </div>
-
   <script src="script.js"></script>
 </body>
 </html>
