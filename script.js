@@ -1,37 +1,83 @@
-const inputBox = document.getElementById("input-box");
-const listContainer = document.getElementById("list-container");
+const taskInput = document.getElementById("input-box");
+var taskList = document.getElementById("list-container");
+
+var taskArray = [];
 
 function addTask() {
-  if (inputBox.value === '') {
-    alert('You must write something!');
-  } else {
-    let li = document.createElement('li');
-    li.innerHTML = inputBox.value;
-    listContainer.appendChild(li);
-    let span = document.createElement('span');
-    span.innerHTML = '\u00d7';
-    li.appendChild(span);
+    const taskText = taskInput.value.trim().toUpperCase();
+    if(taskText === ""){
+        alert("Input the task name");
+    }
+    else  {
+        const task = {
+            id: taskArray.length,
+            taskName: taskText,
+            isCompleted: false,
+        };    
+        taskArray.push(task);
+        taskInput.value = "";
+        console.log("Task " + task.id + " " + task.taskName + " is added");
+        renderList(taskArray);
+    }
+}
+
+function renderList(filteredTasks){   
+  taskList.innerHTML = '';
+  filteredTasks.forEach((task, index) => {
+  var li = document.createElement("li");            
+  
+  const checkbox = document.createElement("input");
+  checkbox.type = "checkbox";
+  checkbox.checked = task.isCompleted;
+  checkbox.addEventListener("change",()=>{
+      taskArray[index].isCompleted = checkbox.checked;
+      console.log("Task " + task.id + " " + task.taskName + " is " + task.isCompleted);
+  })
+
+  const deleteButton = document.createElement("button", id="button-delete");
+  deleteButton.textContent = "Delete";
+  deleteButton.className = "button-delete";
+  deleteButton.addEventListener("click", () => {
+      taskArray.splice(index, 1);
+      renderList(filteredTasks);
+  })
+         
+  const editButton = document.createElement("button", id="button-edit" );
+  editButton.textContent = ("Edit");
+  editButton.className = "button-edit";
+  editButton.addEventListener('click', () => {
+      editTask(index);
+    });
+  li.textContent.className = "ul-text";
+  li.textContent = task.taskName;
+  li.appendChild(checkbox);
+  li.appendChild(deleteButton);
+  li.appendChild(editButton);
+  taskList.appendChild(li);
+});
+}
+
+function editTask(id) {
+  const newTaskName = prompt('Enter new task name:');
+  if (newTaskName !== null) {
+    taskArray[id].taskName = newTaskName.trim().toUpperCase();
+    renderList(taskArray);
   }
-  inputBox.value = '';
-  saveData();
 }
 
-listContainer.addEventListener('click', function(e) {
-  if (e.target.tagName === 'LI') {
-    e.target.classList.toggle('checked');
-    saveData();
-  } else if (e.target.tagName === 'SPAN') {
-    e.target.parentElement.remove();
-    saveData();
+
+function filterTasks() {
+  const filterAll = document.getElementById('filterAll').checked;
+  const filterCompleted = document.getElementById('filterCompleted').checked;
+  const filterUncompleted = document.getElementById('filterUncompleted').checked;
+
+  if (filterAll) {
+    renderList(taskArray);
+  } else if (filterCompleted) {
+    const completedTasks = taskArray.filter(task => task.isCompleted);
+    renderList(completedTasks);
+  } else if (filterUncompleted) {
+    const uncompletedTasks = taskArray.filter(task => !task.isCompleted);
+    renderList(uncompletedTasks);
   }
-}, false);
-
-function saveData() {
-  localStorage.setItem('data', listContainer.innerHTML);
 }
-
-function showTask() {
-  listContainer.innerHTML = localStorage.getItem('data');
-}
-
-showTask();
